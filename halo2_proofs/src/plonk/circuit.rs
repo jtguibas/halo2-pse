@@ -33,7 +33,8 @@ impl<C: ColumnType> Column<C> {
         Column { index, column_type }
     }
 
-    pub(crate) fn index(&self) -> usize {
+    /// Doc
+    pub fn index(&self) -> usize {
         self.index
     }
 
@@ -902,7 +903,7 @@ pub(crate) struct PointIndex(pub usize);
 /// A "virtual cell" is a PLONK cell that has been queried at a particular relative offset
 /// within a custom gate.
 #[derive(Clone, Debug)]
-pub(crate) struct VirtualCell {
+pub struct VirtualCell {
     pub(crate) column: Column<Any>,
     pub(crate) rotation: Rotation,
 }
@@ -1026,8 +1027,9 @@ impl<F: Field, C: Into<Constraint<F>>, Iter: IntoIterator<Item = C>> IntoIterato
     }
 }
 
+/// Doc
 #[derive(Clone, Debug)]
-pub(crate) struct Gate<F: Field> {
+pub struct Gate<F: Field> {
     name: &'static str,
     constraint_names: Vec<&'static str>,
     polys: Vec<Expression<F>>,
@@ -1046,7 +1048,8 @@ impl<F: Field> Gate<F> {
         self.constraint_names[constraint_index]
     }
 
-    pub(crate) fn polynomials(&self) -> &[Expression<F>] {
+    /// Doc
+    pub fn polynomials(&self) -> &[Expression<F>] {
         &self.polys
     }
 
@@ -1631,6 +1634,51 @@ impl<F: Field> ConstraintSystem<F> {
                 // permutation polynomial between the roles of l_last, l_0
                 // and the interstitial values.)
             + 1 // for at least one row
+    }
+
+    /// Doc
+    pub fn num_fixed_columns(&self) -> usize {
+        self.num_fixed_columns
+    }
+
+    /// Doc
+    pub fn num_advice_columns(&self) -> usize {
+        self.num_advice_columns
+    }
+
+    /// Doc
+    pub fn num_instance_columns(&self) -> usize {
+        self.num_instance_columns
+    }
+
+    /// Doc
+    pub fn gates(&self) -> &Vec<Gate<F>> {
+        &self.gates
+    }
+
+    /// Doc
+    pub fn advice_queries(&self) -> &Vec<(Column<Advice>, Rotation)> {
+        &self.advice_queries
+    }
+
+    /// Doc
+    pub fn instance_queries(&self) -> &Vec<(Column<Instance>, Rotation)> {
+        &self.instance_queries
+    }
+
+    /// Doc
+    pub fn fixed_queries(&self) -> &Vec<(Column<Fixed>, Rotation)> {
+        &self.fixed_queries
+    }
+
+    /// Doc
+    pub fn permutation(&self) -> &permutation::Argument {
+        &self.permutation
+    }
+
+    /// Doc
+    pub fn lookups(&self) -> &Vec<lookup::Argument<F>> {
+        &self.lookups
     }
 }
 
