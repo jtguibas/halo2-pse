@@ -1191,6 +1191,7 @@ impl<F: Field> ConstraintSystem<F> {
     /// they need to match.
     pub fn lookup(
         &mut self,
+        name: &'static str,
         table_map: impl FnOnce(&mut VirtualCells<'_, F>) -> Vec<(Expression<F>, TableColumn)>,
     ) -> usize {
         let mut cells = VirtualCells::new(self);
@@ -1209,7 +1210,7 @@ impl<F: Field> ConstraintSystem<F> {
 
         let index = self.lookups.len();
 
-        self.lookups.push(lookup::Argument::new(table_map));
+        self.lookups.push(lookup::Argument::new(name, table_map));
 
         index
     }

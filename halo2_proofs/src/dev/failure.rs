@@ -141,6 +141,8 @@ pub enum VerifyFailure {
     },
     /// A lookup input did not exist in its corresponding table.
     Lookup {
+        /// The name of the lookup that is not satisfied.
+        name: &'static str,
         /// The index of the lookup that is not satisfied. These indices are assigned in
         /// the order in which `ConstraintSystem::lookup` is called during
         /// `Circuit::configure`.
@@ -203,9 +205,16 @@ impl fmt::Display for VerifyFailure {
                 )
             }
             Self::Lookup {
+                name,
                 lookup_index,
                 location,
-            } => write!(f, "Lookup {} is not satisfied {}", lookup_index, location),
+            } => {
+                write!(
+                    f,
+                    "Lookup {}(index: {}) is not satisfied {}",
+                    name, lookup_index, location
+                )
+            }
             Self::Permutation { column, location } => {
                 write!(
                     f,
@@ -365,6 +374,7 @@ fn render_constraint_not_satisfied<F: Field>(
 /// ```
 fn render_lookup<F: FieldExt>(
     prover: &MockProver<F>,
+    name: &str,
     lookup_index: usize,
     location: &FailureLocation,
 ) {
@@ -426,7 +436,7 @@ fn render_lookup<F: FieldExt>(
     eprintln!(")");
 
     eprintln!();
-    eprintln!("  Lookup inputs:");
+    eprintln!("  Lookup '{}' inputs:", name);
     for (i, input) in lookup.input_expressions.iter().enumerate() {
         // Fetch the cell values (since we don't store them in VerifyFailure::Lookup).
         let cell_values = input.evaluate(
@@ -482,7 +492,7 @@ fn render_lookup<F: FieldExt>(
         eprintln!("    ^");
         emitter::render_cell_layout("    | ", location, &columns, &layout, |_, rotation| {
             if rotation == 0 {
-                eprint!(" <--{{ Lookup inputs queried here");
+                eprint!(" <--{{ Lookup '{}' inputs queried here", name);
             }
         });
 
@@ -521,9 +531,10 @@ impl VerifyFailure {
                 render_constraint_not_satisfied(&prover.cs.gates, constraint, location, cell_values)
             }
             Self::Lookup {
+                name,
                 lookup_index,
                 location,
-            } => render_lookup(prover, *lookup_index, location),
+            } => render_lookup(prover, name, *lookup_index, location),
             _ => eprintln!("{}", self),
         }
     }
