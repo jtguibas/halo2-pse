@@ -941,8 +941,9 @@ impl<F: Field> From<Expression<F>> for Vec<Constraint<F>> {
 
 #[derive(Clone, Debug, Serialize, Deserialize)]
 pub(crate) struct Gate<F: Field> {
-    name: &'static str,
-    constraint_names: Vec<&'static str>,
+    // name: &'static str,
+    name: String,
+    constraint_names: Vec<String>,
     polys: Vec<Expression<F>>,
     /// We track queried selectors separately from other cells, so that we can use them to
     /// trigger debug checks on gates.
@@ -950,14 +951,13 @@ pub(crate) struct Gate<F: Field> {
     queried_cells: Vec<VirtualCell>,
 }
 
-
 impl<F: Field> Gate<F> {
-    pub(crate) fn name(&self) -> &'static str {
-        self.name
+    pub(crate) fn name(&self) -> String {
+        self.name.clone()
     }
 
-    pub(crate) fn constraint_name(&self, constraint_index: usize) -> &'static str {
-        self.constraint_names[constraint_index]
+    pub(crate) fn constraint_name(&self, constraint_index: usize) -> String {
+        self.constraint_names[constraint_index].clone()
     }
 
     pub(crate) fn polynomials(&self) -> &[Expression<F>] {
@@ -1270,19 +1270,27 @@ impl<F: Field> ConstraintSystem<F> {
         let queried_selectors = cells.queried_selectors;
         let queried_cells = cells.queried_cells;
 
-        let (constraint_names, polys): (_, Vec<_>) = constraints
+        let (cs_names, polys): (Vec<&str>, Vec<_>) = constraints
             .into_iter()
             .map(|c| c.into())
             .map(|c| (c.name, c.poly))
             .unzip();
+
+        // let x = constraints
+        //     .into_iter()
+        //     .map(|c| c.into())
+        //     .map(|c| (c.name, c.poly))
+        //     .collect();
 
         assert!(
             !polys.is_empty(),
             "Gates must contain at least one constraint."
         );
 
+        let constraint_names: Vec<String> = cs_names.into_iter().map(|x| x.to_string()).collect();
+
         self.gates.push(Gate {
-            name,
+            name: name.to_string(),
             constraint_names,
             polys,
             queried_selectors,

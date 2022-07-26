@@ -16,6 +16,7 @@ use group::{
     ff::{BatchInvert, Field},
     Curve,
 };
+use serde::{Deserialize, Serialize};
 use std::any::TypeId;
 use std::convert::TryInto;
 use std::num::ParseIntError;
@@ -34,7 +35,7 @@ fn get_rotation_idx(idx: usize, rot: i32, rot_scale: i32, isize: i32) -> usize {
 }
 
 /// Value used in a calculation
-#[derive(Clone, Copy, Debug, PartialEq, PartialOrd)]
+#[derive(Clone, Copy, Debug, PartialEq, PartialOrd, Serialize, Deserialize)]
 pub enum ValueSource {
     /// This is a constant value
     Constant(usize),
@@ -76,7 +77,7 @@ impl ValueSource {
 }
 
 /// Calculation
-#[derive(Clone, Debug, PartialEq)]
+#[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
 pub enum Calculation {
     /// This is an addition
     Add(ValueSource, ValueSource),
@@ -237,7 +238,7 @@ impl Calculation {
 }
 
 /// EvaluationData
-#[derive(Default, Debug)]
+#[derive(Default, Debug, Serialize, Deserialize)]
 pub struct Evaluator<C: CurveAffine> {
     /// Constants
     pub constants: Vec<C::ScalarExt>,
@@ -252,7 +253,7 @@ pub struct Evaluator<C: CurveAffine> {
 }
 
 /// CaluclationInfo
-#[derive(Debug)]
+#[derive(Debug, Serialize, Deserialize)]
 pub struct CalculationInfo {
     /// Calculation
     pub calculation: Calculation,

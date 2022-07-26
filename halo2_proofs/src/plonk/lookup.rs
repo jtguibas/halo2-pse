@@ -7,7 +7,7 @@ pub(crate) mod verifier;
 
 #[derive(Clone, Debug, Serialize, Deserialize)]
 pub(crate) struct Argument<F: Field> {
-    pub name: &'static str,
+    pub name: String,
     pub input_expressions: Vec<Expression<F>>,
     pub table_expressions: Vec<Expression<F>>,
 }
@@ -19,7 +19,7 @@ impl<F: Field> Argument<F> {
     pub fn new(name: &'static str, table_map: Vec<(Expression<F>, Expression<F>)>) -> Self {
         let (input_expressions, table_expressions) = table_map.into_iter().unzip();
         Argument {
-            name,
+            name: name.to_string(),
             input_expressions,
             table_expressions,
         }

@@ -155,7 +155,7 @@ pub enum VerifyFailure {
     /// A lookup input did not exist in its corresponding table.
     Lookup {
         /// The name of the lookup that is not satisfied.
-        name: &'static str,
+        name: String,
         /// The index of the lookup that is not satisfied. These indices are assigned in
         /// the order in which `ConstraintSystem::lookup` is called during
         /// `Circuit::configure`.
@@ -991,7 +991,7 @@ impl<F: FieldExt> MockProver<F> {
                                 None
                             } else {
                                 Some(VerifyFailure::Lookup {
-                                    name: lookup.name,
+                                    name: lookup.name.clone(),
                                     lookup_index,
                                     location: FailureLocation::find_expressions(
                                         &self.cs,
