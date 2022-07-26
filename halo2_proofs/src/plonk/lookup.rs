@@ -1,10 +1,11 @@
 use super::circuit::Expression;
 use ff::Field;
+use serde::{Deserialize, Serialize};
 
 pub(crate) mod prover;
 pub(crate) mod verifier;
 
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, Serialize, Deserialize)]
 pub(crate) struct Argument<F: Field> {
     pub name: &'static str,
     pub input_expressions: Vec<Expression<F>>,

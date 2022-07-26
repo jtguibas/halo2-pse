@@ -37,10 +37,11 @@ pub use verifier::*;
 use std::io;
 
 use self::evaluation::Evaluator;
+use serde::Serialize;
 
 /// This is a verifying key which allows for the verification of proofs for a
 /// particular circuit.
-#[derive(Debug)]
+#[derive(Debug, Serialize)]
 pub struct VerifyingKey<C: CurveAffine> {
     domain: EvaluationDomain<C::Scalar>,
     fixed_commitments: Vec<C>,

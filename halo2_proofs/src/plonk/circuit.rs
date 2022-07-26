@@ -1,6 +1,7 @@
 use core::cmp::max;
 use core::ops::{Add, Mul};
 use ff::Field;
+use serde::{Deserialize, Serialize};
 use std::{
     convert::TryFrom,
     ops::{Neg, Sub},
@@ -19,7 +20,7 @@ pub trait ColumnType:
 }
 
 /// A column with an index and type
-#[derive(Clone, Copy, Debug, Eq, PartialEq, Hash)]
+#[derive(Clone, Copy, Debug, Eq, PartialEq, Hash, Serialize, Deserialize)]
 pub struct Column<C: ColumnType> {
     index: usize,
     column_type: C,
@@ -61,19 +62,19 @@ impl<C: ColumnType> PartialOrd for Column<C> {
 }
 
 /// An advice column
-#[derive(Clone, Copy, Debug, Eq, PartialEq, Hash)]
+#[derive(Clone, Copy, Debug, Eq, PartialEq, Hash, Serialize, Deserialize)]
 pub struct Advice;
 
 /// A fixed column
-#[derive(Clone, Copy, Debug, Eq, PartialEq, Hash)]
+#[derive(Clone, Copy, Debug, Eq, PartialEq, Hash, Serialize, Deserialize)]
 pub struct Fixed;
 
 /// An instance column
-#[derive(Clone, Copy, Debug, Eq, PartialEq, Hash)]
+#[derive(Clone, Copy, Debug, Eq, PartialEq, Hash, Serialize, Deserialize)]
 pub struct Instance;
 
 /// An enum over the Advice, Fixed, Instance structs
-#[derive(Clone, Copy, Debug, Eq, PartialEq, Hash)]
+#[derive(Clone, Copy, Debug, Eq, PartialEq, Hash, Serialize, Deserialize)]
 pub enum Any {
     /// An Advice variant
     Advice,
@@ -248,7 +249,7 @@ impl TryFrom<Column<Any>> for Column<Instance> {
 ///     Ok(())
 /// }
 /// ```
-#[derive(Clone, Copy, Debug, PartialEq, Eq, Hash)]
+#[derive(Clone, Copy, Debug, PartialEq, Eq, Hash, Serialize, Deserialize)]
 pub struct Selector(pub(crate) usize, bool);
 
 impl Selector {
@@ -443,7 +444,7 @@ pub trait Circuit<F: Field> {
 }
 
 /// Low-degree expression representing an identity that must hold over the committed columns.
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, Serialize, Deserialize)]
 pub enum Expression<F> {
     /// This is a constant polynomial
     Constant(F),
@@ -896,7 +897,7 @@ pub(crate) struct PointIndex(pub usize);
 
 /// A "virtual cell" is a PLONK cell that has been queried at a particular relative offset
 /// within a custom gate.
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, Serialize, Deserialize)]
 pub(crate) struct VirtualCell {
     pub(crate) column: Column<Any>,
     pub(crate) rotation: Rotation,
@@ -938,7 +939,7 @@ impl<F: Field> From<Expression<F>> for Vec<Constraint<F>> {
     }
 }
 
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, Serialize, Deserialize)]
 pub(crate) struct Gate<F: Field> {
     name: &'static str,
     constraint_names: Vec<&'static str>,
@@ -948,6 +949,7 @@ pub(crate) struct Gate<F: Field> {
     queried_selectors: Vec<Selector>,
     queried_cells: Vec<VirtualCell>,
 }
+
 
 impl<F: Field> Gate<F> {
     pub(crate) fn name(&self) -> &'static str {
@@ -973,7 +975,7 @@ impl<F: Field> Gate<F> {
 
 /// This is a description of the circuit environment, such as the gate, column and
 /// permutation arrangements.
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct ConstraintSystem<F: Field> {
     pub(crate) num_fixed_columns: usize,
     pub(crate) num_advice_columns: usize,
